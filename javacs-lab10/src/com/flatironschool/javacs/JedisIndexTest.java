@@ -31,9 +31,12 @@ public class JedisIndexTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		System.out.println("SETUP");
 		jedis = JedisMaker.make();
 		index = new JedisIndex(jedis);
-		
+		//index.deleteURLSets();
+		//index.deleteTermCounters();
+		//index.deleteAllKeys();
 		loadIndex(index);
 	}
 	
@@ -47,7 +50,9 @@ public class JedisIndexTest {
 		WikiFetcher wf = new WikiFetcher();
 
 		url1 = "https://en.wikipedia.org/wiki/Java_(programming_language)";
+		System.out.println("about to read");
 		Elements paragraphs = wf.readWikipedia(url1);
+		System.out.println("read successfully");
 		index.indexPage(url1, paragraphs);
 		
 		url2 = "https://en.wikipedia.org/wiki/Programming_language";

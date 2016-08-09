@@ -67,8 +67,8 @@ public class JedisIndex {
 	 * @return Set of URLs.
 	 */
 	public Set<String> getURLs(String term) {
-        // FILL THIS IN!
-		return null;
+		System.out.println("getting urls for "+term);
+		return jedis.smembers(urlSetKey(term));
 	}
 
     /**
@@ -78,8 +78,18 @@ public class JedisIndex {
 	 * @return Map from URL to count.
 	 */
 	public Map<String, Integer> getCounts(String term) {
-        // FILL THIS IN!
-		return null;
+		System.out.println("In GetCounts");
+        // step 0: make data structure
+		Map<String, Integer> countsMap = new HashMap<String,Integer>();
+		// step 1: determine set of urls have the term using urlset:term
+		Set<String> URLs = getURLs(term);
+		// step 2: for every url:
+		for (String url: URLs) {
+			//put url,termCount into map
+			countsMap.put(url,getCount(url,term));
+		}
+		//step 3: return map
+		return countsMap;
 	}
 
     /**
@@ -90,8 +100,8 @@ public class JedisIndex {
 	 * @return
 	 */
 	public Integer getCount(String url, String term) {
-        // FILL THIS IN!
-		return null;
+		System.out.println("getting counts for "+term+"in "+url);
+        return Integer.parseInt(jedis.hget(termCounterKey(url),term));
 	}
 
 
@@ -102,7 +112,22 @@ public class JedisIndex {
 	 * @param paragraphs  Collection of elements that should be indexed.
 	 */
 	public void indexPage(String url, Elements paragraphs) {
-        // FILL THIS IN!
+		// make a TermCounter and count the terms in the paragraphs
+		TermCounter tc = new TermCounter(url);
+		tc.processElements(paragraphs);
+		Transaction tran = jedis.multi();
+		// for each term in the TermCounter, add the TermCounter to the index
+		for (String term: tc.keySet()) {
+//			if (isIndexed(term)) {
+//				tran.hincrBy(url,term,1);
+//			}
+//			else {
+//				tran.hset(url, term, Integer.toString(1));
+//			}
+			tran.sadd(urlSetKey(term),url);
+			tran.hset(termCounterKey(url),term,tc.get(term).toString());
+		}
+		tran.exec();	
 	}
 
 	/**

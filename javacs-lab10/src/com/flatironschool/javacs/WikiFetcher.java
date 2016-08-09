@@ -53,8 +53,10 @@ public class WikiFetcher {
     String filename = "resources" + slash + realURL.getHost() + realURL.getPath();
 
     // read the file
+    System.out.println("About to read");
     InputStream stream = WikiFetcher.class.getClassLoader().getResourceAsStream(filename);
     Document doc = Jsoup.parse(stream, "UTF-8", filename);
+    System.out.println("FINISHED PARSING");
 
 		// TODO: factor out the following repeated code
 		Element content = doc.getElementById("mw-content-text");

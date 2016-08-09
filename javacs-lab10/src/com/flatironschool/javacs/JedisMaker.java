@@ -48,6 +48,7 @@ public class JedisMaker {
 		br.close();
 
 		URI uri;
+		System.out.println("FILE EXISTS");
 		try {
 			uri = new URI(sb.toString());
 		} catch (URISyntaxException e) {
